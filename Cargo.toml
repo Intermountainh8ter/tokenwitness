@@ -1,0 +1,24 @@
+[package]
+name = "tokenwitness"
+version = "0.0.1"
+edition = "2021"
+license = "MIT"
+description = "Audit the byte-identity of chat-template rendering across inference stacks."
+repository = "https://github.com/Intermountainh8ter/tokenwitness"
+keywords = ["llm", "chat-template", "tokenization", "audit"]
+categories = ["command-line-utilities", "development-tools::testing"]
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+sha2 = "0.10"
+
+[[bin]]
+name = "tokenwitness"
+path = "src/main.rs"
+
+[lib]
+name = "tokenwitness"
+path = "src/lib.rs"
