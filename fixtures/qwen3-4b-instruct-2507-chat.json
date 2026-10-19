@@ -1,0 +1,11 @@
+{
+  "name": "qwen3-4b-instruct-2507-chat",
+  "model": "Qwen/Qwen3-4B-Instruct-2507",
+  "messages": [
+    {"role": "system", "content": "You are a terse assistant. Answer in one sentence."},
+    {"role": "user", "content": "What is the boiling point of water at sea level in Celsius?"},
+    {"role": "assistant", "content": "100 °C."},
+    {"role": "user", "content": "And in Fahrenheit? Reply with the number only.\n\nThanks."}
+  ],
+  "add_generation_prompt": true
+}

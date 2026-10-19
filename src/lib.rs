@@ -8,6 +8,8 @@
 //! downstream behavior changes without warning. This crate records the
 //! exact bytes each stack produces and reports the diff.
 
+pub mod capture;
+
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 

@@ -1,0 +1,17 @@
+{
+  "n_files": 9,
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "sha256": {
+    "fixtures/qwen3-4b-instruct-2507-chat.json": "539b38699ed397152a3967d17066308a25e22eb28c2b64c925563df406c6de23",
+    "fixtures/qwen3-4b-instruct-2507-nosystem.json": "d2234b01ee492e79834beab453f207b8b884afbf8f874bbdc84e535ae733cb05",
+    "renderings/qwen3-4b-instruct-2507-chat-hf.json": "7587d6ed35bdebe09210f95d78b636ecee04710f950c8e3365b90f1b1876e166",
+    "renderings/qwen3-4b-instruct-2507-chat-llamacpp.json": "6cff7600fbddbe94e6b76365efa99f1bffd5472476fda193d7e0bb6b96036305",
+    "renderings/qwen3-4b-instruct-2507-chat-minijinja.json": "b4f7ee1fc6a1295f92ab688e7aaea22588c2e96a979518b1ac45c9c1a7a0390d",
+    "renderings/qwen3-4b-instruct-2507-nosystem-hf.json": "1eff2c472811f53fbfa96e83444de6da24c19dd37bd37a5be7e2ef2ab31279c9",
+    "renderings/qwen3-4b-instruct-2507-nosystem-llamacpp.json": "dec144f530a39c6ab277cc1c3e1dc4c4defee4e9c33c9a0bbdf90d83c3fa5d27",
+    "renderings/qwen3-4b-instruct-2507-nosystem-minijinja.json": "cdea3e7eeff9dafde41194034ae257fce9cc9cc71c7e853bd719d24129a07bbc",
+    "results/report.json": "90cc816b850bf794ff274bacd38156c83f69cb74fc48e4448fa5f60ba73fb151"
+  },
+  "tool": "bench-report 0.1.0",
+  "unix_time": 1792427017
+}
