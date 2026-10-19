@@ -56,6 +56,35 @@ pub fn finish(fixture: &Prompt, stack: &str, stack_version: &str, method: &str, 
     }
 }
 
+
+/// A fresh private directory (mode 0700) under the system temp dir whose name cannot be
+/// predicted or pre-created by another user: created with `create_dir` (fails if it exists),
+/// retried with a new suffix on collision.
+fn private_tempdir(prefix: &str) -> anyhow::Result<std::path::PathBuf> {
+    use std::os::unix::fs::DirBuilderExt;
+    let base = std::env::temp_dir();
+    for attempt in 0..64u32 {
+        let nanos = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).map(|d| d.as_nanos()).unwrap_or(0);
+        let salt = nanos ^ ((std::process::id() as u128) << 64) ^ ((attempt as u128) << 96) ^ (&base as *const _ as usize as u128);
+        let dir = base.join(format!("{prefix}-{salt:032x}"));
+        match std::fs::DirBuilder::new().mode(0o700).create(&dir) {
+            Ok(()) => return Ok(dir),
+            Err(e) if e.kind() == std::io::ErrorKind::AlreadyExists => continue,
+            Err(e) => return Err(e.into()),
+        }
+    }
+    anyhow::bail!("could not create a private temporary directory")
+}
+
+/// Write a new file that must not already exist (O_EXCL), mode 0600.
+fn write_new(path: &std::path::Path, bytes: &[u8]) -> anyhow::Result<()> {
+    use std::io::Write;
+    use std::os::unix::fs::OpenOptionsExt;
+    let mut f = std::fs::OpenOptions::new().write(true).create_new(true).mode(0o600).open(path)?;
+    f.write_all(bytes)?;
+    Ok(())
+}
+
 /// Hugging Face transformers in a given interpreter. The model directory must hold
 /// `tokenizer_config.json` with a `chat_template`.
 pub fn capture_hf(fixture: &Prompt, python: &Path, model_dir: &Path) -> anyhow::Result<Capture> {
@@ -71,12 +100,11 @@ tpl = tok.chat_template if isinstance(tok.chat_template, str) else json.dumps(to
 open(sys.argv[4], "wb").write(tpl.encode("utf-8"))
 print(transformers.__version__)
 "#;
-    let dir = std::env::temp_dir().join(format!("tokenwitness-hf-{}", std::process::id()));
-    std::fs::create_dir_all(&dir)?;
+    let dir = private_tempdir("tokenwitness-hf")?;
     let spec = dir.join("spec.json");
     let out = dir.join("out.bin");
     let tpl = dir.join("template.jinja");
-    std::fs::write(&spec, serde_json::to_vec(&serde_json::json!({"messages": fixture.messages, "add_generation_prompt": fixture.add_generation_prompt}))?)?;
+    write_new(&spec, &serde_json::to_vec(&serde_json::json!({"messages": fixture.messages, "add_generation_prompt": fixture.add_generation_prompt}))?)?;
     let o = std::process::Command::new(python).arg("-I").arg("-c").arg(script).arg(&spec).arg(model_dir).arg(&out).arg(&tpl).output()?;
     anyhow::ensure!(o.status.success(), "hf capture failed: {}", String::from_utf8_lossy(&o.stderr).lines().last().unwrap_or(""));
     let version = String::from_utf8_lossy(&o.stdout).trim().to_string();
